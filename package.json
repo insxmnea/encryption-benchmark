@@ -1,0 +1,16 @@
+{
+  "name": "encryption-benchmark",
+  "version": "1.0.0",
+  "description": "benchmark tests for each encryption types",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "klltx",
+  "license": "ISC",
+  "dependencies": {
+    "crypto": "^1.0.1",
+    "crypto-js": "^4.1.1"
+  }
+}
