@@ -5,13 +5,14 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "node prompt.js"
   },
   "author": "klltx",
   "license": "ISC",
   "dependencies": {
     "@types/crypto-js": "^4.1.1",
     "crypto": "^1.0.1",
-    "crypto-js": "^4.1.1"
+    "crypto-js": "^4.1.1",
+    "prompt": "^1.2.2"
   }
 }

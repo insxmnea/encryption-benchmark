@@ -2,8 +2,6 @@ const fs = require("fs"),
     crypto = require("crypto"),
     CryptoJS = require("crypto-js");
 
-const message = fs.readFileSync("./data.txt", "utf8");
-
 const initVector = crypto.randomBytes(16),
     securityKey = crypto.randomBytes(32).toString();
 
@@ -40,32 +38,39 @@ function encryptBenchmark(message, method, mode, securityKey, initVector) {
         time: timeEnd - timeStart,
         decrypted
     })
+//GetLiveOutput
+    console.clear()
+    benchmarkResults.sort((a, b) => a.time - b.time)
+    benchmarkResults.forEach(v => console.log(v.output))
+}
+function getBenchmarkTest(path) {
+    const message = fs.readFileSync(path, "utf8");
+//DES3
+    encryptBenchmark(message, encryptMethods.des3, encryptModes.cbc, securityKey, initVector);
+    encryptBenchmark(message, encryptMethods.des3, encryptModes.cfb, securityKey, initVector);
+    encryptBenchmark(message, encryptMethods.des3, encryptModes.ctr, securityKey, initVector);
+    encryptBenchmark(message, encryptMethods.des3, encryptModes.ecb, securityKey, initVector);
+    encryptBenchmark(message, encryptMethods.des3, encryptModes.ofb, securityKey, initVector);
+//DES
+    encryptBenchmark(message, encryptMethods.des, encryptModes.cbc, securityKey, initVector);
+    encryptBenchmark(message, encryptMethods.des, encryptModes.cfb, securityKey, initVector);
+    encryptBenchmark(message, encryptMethods.des, encryptModes.ctr, securityKey, initVector);
+    encryptBenchmark(message, encryptMethods.des, encryptModes.ecb, securityKey, initVector);
+    encryptBenchmark(message, encryptMethods.des, encryptModes.ofb, securityKey, initVector);
+//RC4
+    encryptBenchmark(message, encryptMethods.rc4, encryptModes.cbc, securityKey, initVector);
+    encryptBenchmark(message, encryptMethods.rc4, encryptModes.cfb, securityKey, initVector);
+    encryptBenchmark(message, encryptMethods.rc4, encryptModes.ctr, securityKey, initVector);
+    encryptBenchmark(message, encryptMethods.rc4, encryptModes.ecb, securityKey, initVector);
+    encryptBenchmark(message, encryptMethods.rc4, encryptModes.ofb, securityKey, initVector);
+//Rabbit
+    encryptBenchmark(message, encryptMethods.rabbit, encryptModes.cbc, securityKey, initVector);
+    encryptBenchmark(message, encryptMethods.rabbit, encryptModes.cfb, securityKey, initVector);
+    encryptBenchmark(message, encryptMethods.rabbit, encryptModes.ctr, securityKey, initVector);
+    encryptBenchmark(message, encryptMethods.rabbit, encryptModes.ecb, securityKey, initVector);
+    encryptBenchmark(message, encryptMethods.rabbit, encryptModes.ofb, securityKey, initVector);
 }
 
-//DES3
-encryptBenchmark(message, encryptMethods.des3, encryptModes.cbc, securityKey, initVector);
-encryptBenchmark(message, encryptMethods.des3, encryptModes.cfb, securityKey, initVector);
-encryptBenchmark(message, encryptMethods.des3, encryptModes.ctr, securityKey, initVector);
-encryptBenchmark(message, encryptMethods.des3, encryptModes.ecb, securityKey, initVector);
-encryptBenchmark(message, encryptMethods.des3, encryptModes.ofb, securityKey, initVector);
-//DES
-encryptBenchmark(message, encryptMethods.des, encryptModes.cbc, securityKey, initVector);
-encryptBenchmark(message, encryptMethods.des, encryptModes.cfb, securityKey, initVector);
-encryptBenchmark(message, encryptMethods.des, encryptModes.ctr, securityKey, initVector);
-encryptBenchmark(message, encryptMethods.des, encryptModes.ecb, securityKey, initVector);
-encryptBenchmark(message, encryptMethods.des, encryptModes.ofb, securityKey, initVector);
-//RC4
-encryptBenchmark(message, encryptMethods.rc4, encryptModes.cbc, securityKey, initVector);
-encryptBenchmark(message, encryptMethods.rc4, encryptModes.cfb, securityKey, initVector);
-encryptBenchmark(message, encryptMethods.rc4, encryptModes.ctr, securityKey, initVector);
-encryptBenchmark(message, encryptMethods.rc4, encryptModes.ecb, securityKey, initVector);
-encryptBenchmark(message, encryptMethods.rc4, encryptModes.ofb, securityKey, initVector);
-//Rabbit
-encryptBenchmark(message, encryptMethods.rabbit, encryptModes.cbc, securityKey, initVector);
-encryptBenchmark(message, encryptMethods.rabbit, encryptModes.cfb, securityKey, initVector);
-encryptBenchmark(message, encryptMethods.rabbit, encryptModes.ctr, securityKey, initVector);
-encryptBenchmark(message, encryptMethods.rabbit, encryptModes.ecb, securityKey, initVector);
-encryptBenchmark(message, encryptMethods.rabbit, encryptModes.ofb, securityKey, initVector);
-
-benchmarkResults.sort((a, b) => a.time - b.time)
-benchmarkResults.forEach(v => console.log(v.output))
+module.exports = {
+    getBenchmarkTest
+}
