@@ -1,26 +1,71 @@
-const fs = require("fs");
-const crypto = require ("crypto");
+const fs = require("fs"),
+    crypto = require("crypto"),
+    CryptoJS = require("crypto-js");
 
-const message = fs.readFileSync('./data.txt', 'utf8');
+const message = fs.readFileSync("./data.txt", "utf8");
 
-const algorithm = "aes-256-cbc";
+const initVector = crypto.randomBytes(16),
+    securityKey = crypto.randomBytes(32).toString();
 
-const initVector = crypto.randomBytes(16);
+const encryptMethods = {
+    aes: "AES",
+    des: "DES",
+    des3: "TripleDES",
+    rabbit: "Rabbit",
+    rc4: "RC4",
+};
 
-const SecurityKey = crypto.randomBytes(32);
+const encryptModes = {
+    cbc: "CBC",
+    cfb: "CFB",
+    ctr: "CTR",
+    ofb: "OFB",
+    ecb: "ECB",
+};
 
-const cipher = crypto.createCipheriv(algorithm, SecurityKey, initVector);
+const benchmarkResults = []
 
-let encryptedData = cipher.update(message, "utf-8", "hex");
+function encryptBenchmark(message, method, mode, securityKey, initVector) {
+    const timeStart = Date.now();
+    const encrypted = CryptoJS[method].encrypt(JSON.stringify(message), securityKey, {
+        iv: initVector,
+        mode: CryptoJS.mode[mode],
+        padding: CryptoJS.pad.Pkcs7
+    });
+    const decrypted = CryptoJS[method].decrypt(encrypted.toString(), securityKey);
+    const timeEnd = Date.now();
 
-encryptedData += cipher.final("hex");
+    benchmarkResults.push({
+        output: `${method}, ${mode}: ${timeEnd - timeStart}ms`,
+        time: timeEnd - timeStart,
+        decrypted
+    })
+}
 
-console.log("Encrypted message: " + encryptedData);
+//DES3
+encryptBenchmark(message, encryptMethods.des3, encryptModes.cbc, securityKey, initVector);
+encryptBenchmark(message, encryptMethods.des3, encryptModes.cfb, securityKey, initVector);
+encryptBenchmark(message, encryptMethods.des3, encryptModes.ctr, securityKey, initVector);
+encryptBenchmark(message, encryptMethods.des3, encryptModes.ecb, securityKey, initVector);
+encryptBenchmark(message, encryptMethods.des3, encryptModes.ofb, securityKey, initVector);
+//DES
+encryptBenchmark(message, encryptMethods.des, encryptModes.cbc, securityKey, initVector);
+encryptBenchmark(message, encryptMethods.des, encryptModes.cfb, securityKey, initVector);
+encryptBenchmark(message, encryptMethods.des, encryptModes.ctr, securityKey, initVector);
+encryptBenchmark(message, encryptMethods.des, encryptModes.ecb, securityKey, initVector);
+encryptBenchmark(message, encryptMethods.des, encryptModes.ofb, securityKey, initVector);
+//RC4
+encryptBenchmark(message, encryptMethods.rc4, encryptModes.cbc, securityKey, initVector);
+encryptBenchmark(message, encryptMethods.rc4, encryptModes.cfb, securityKey, initVector);
+encryptBenchmark(message, encryptMethods.rc4, encryptModes.ctr, securityKey, initVector);
+encryptBenchmark(message, encryptMethods.rc4, encryptModes.ecb, securityKey, initVector);
+encryptBenchmark(message, encryptMethods.rc4, encryptModes.ofb, securityKey, initVector);
+//Rabbit
+encryptBenchmark(message, encryptMethods.rabbit, encryptModes.cbc, securityKey, initVector);
+encryptBenchmark(message, encryptMethods.rabbit, encryptModes.cfb, securityKey, initVector);
+encryptBenchmark(message, encryptMethods.rabbit, encryptModes.ctr, securityKey, initVector);
+encryptBenchmark(message, encryptMethods.rabbit, encryptModes.ecb, securityKey, initVector);
+encryptBenchmark(message, encryptMethods.rabbit, encryptModes.ofb, securityKey, initVector);
 
-const decipher = crypto.createDecipheriv(algorithm, SecurityKey, initVector);
-
-let decryptedData = decipher.update(encryptedData, "hex", "utf-8");
-
-decryptedData += decipher.final("utf8");
-
-console.log("Decrypted message: " + decryptedData);
+benchmarkResults.sort((a, b) => a.time - b.time)
+benchmarkResults.forEach(v => console.log(v.output))
